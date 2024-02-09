@@ -1,7 +1,194 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  </script>
+  <script type="text/javascript"
+          src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">Stephanie Fu</h2>
+<div align="middle">
+  <a href="https://github.com/cal-cs184-student/hw1-rasterizer-sp24-fus/blob/master/docs/index.html">Link to writeup</a>
+</div>
+
+<h2 align="middle">Overview</h2>
+<p>
+  In this homework, I implemented a basic rasterizer starting with line checks to rasterize single triangles. The final product includes various pixel and level sampling options. I found the mipmap part of the homework especially interesting, as I could see the resolution difference in various regions of an image as I switched between zero and various level sampling options - seeing these resolution changes helped me build intuition.
+</p>
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+
+<p>$\texttt{rasterize_triangle()}$ is written as follows: First, we build $\texttt{Vector2D}$ objects representing normal vectors (vertex $0 \rightarrow 1, 1 \rightarrow 2, 2 \rightarrow 0$). Then, we find the triangle's bounding box and only loop through those points: inside the loop, we check $V \cdot N$ and whether the signs of each dot product are equal. If all signs $\geq$ 0 (or all signs $\leq$ 0), we $\texttt{fill_pixel()}$.
+<br><br>
+  This algorithm is slightly better than fully checking each sample because of an optimization: we first check whether the point lies on the same side of two lines, and do not continue checking if it does not. The timing for this optimization is labeled as "Half-check" below. Additionally, we move some redundant FLOPs outside of the loops and get a small speed-up.
+</p>
+
+  <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+    .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg .tg-7btt{border-color:inherit;font-weight:bold;text-align:center;vertical-align:top}
+    .tg .tg-fymr{border-color:inherit;font-weight:bold;text-align:left;vertical-align:top}
+    .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+  </style>
+  <table class="tg">
+    <thead>
+    <tr>
+      <th class="tg-7btt">Method</th>
+      <th class="tg-fymr">Clock ticks</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td class="tg-0pky">Bounding box</td>
+      <td class="tg-0pky">5440</td>
+    </tr>
+    <tr>
+      <td class="tg-0pky">Fewer loop FLOPs</td>
+      <td class="tg-0pky">5233
+      </td>
+    </tr>
+    <tr>
+      <td class="tg-0pky">Half-check</td>
+      <td class="tg-0pky">4601</td>
+    </tr>
+    </tbody>
+  </table>
+<br>
+  <style type="text/css">
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .caption {
+      text-align: center;
+      font-style: italic;
+      margin-top: 0;
+      padding-top: 0;
+    }
+  </style>
+  <img src="images/1.png" width="400px"/>
+  <p class="caption">Figure 1: Screenshot of a rasterized image with the pixel inspector focused on a triangle corner.</p>
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+  My supersampling algorithm resizes the sample buffer to $(width \cdot \sqrt{s}) \text{ x } (height \cdot \sqrt{s})$ where $s$ is the sampling frequency. Then, I updated the indexing arithmetic for the sample buffer and RGB frame buffer to account for the more granular sampling. In $\texttt{resolve_to_framebuffer()}$, I loop through the supersampled points in one grid square to calculate the average color for the frame buffer.
+<br>
+  <style type="text/css">
+    .row-4 {
+      display: inline-block;
+    }
+    .centered {
+      margin: auto;
+        text-align: center;
+    }
+    </style>
+  <div class="centered">
+    <img src="images/2-1.png" class="row-4" width="230px"/>
+    <img src="images/2-2.png" class="row-4" width="230px"/>
+    <img src="images/2-3.png" class="row-4" width="230px"/>
+    <img src="images/2-4.png" class="row-4" width="230px"/>
+  </div>
+  <p class="caption">
+    Screenshot of a rasterized image with the pixel inspector focused on a triangle corner, with supersampling frequencies = 1 (left), 4, 9, 16 (right).
+  </p>
+  <br><br>
+  <div class="centered">
+    <img src="images/2-5.png" class="row-4" width="230px"/>
+    <img src="images/2-6.png" class="row-4" width="230px"/>
+  </div>
+  <p class="caption">
+    Screenshot of a rasterized image with the pixel inspector focused on a triangle corner, with supersampling methods = grid (left) and jitter (right). Jitter supersampling is implemented in the same way as grid supersampling, except instead of averaging colors within a grid square, a random supersampled value is chosen so the output is nondeterministic (and more jumpy).
+  </p>
+
+
+<h3 align="middle">Part 3: Transforms</h3>
+See Figure below for the updated robot.svg with cubeman doing a fun arm-waving dance. The additional transform mainly consisted of additional rotations and updated translations.
+<br>
+  <img src="images/3-1.png" width="300px"/>
+  <p class="caption">Dancing cubeman!</p>
+
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+  Barycentric interpolation is a method to smoothly determine values that lie within a triangle with values assigned to each vertex. As shown in the figure below (left), given a definition of pure red, green, and blue for each triangle corner, barycentric interpolation takes a convex combination of these three values (weighted by distance to each vertex) to determine the value at each point.
+
+  <div class="centered">
+    <img src="images/4-1.png" class="row-4" width="200px"/>
+    <img src="images/4-2.png" class="row-4" width="250px"/>
+  </div>
+  <br>
+    <p class="caption">Left: Visual aid for explanation of barycentric interpolation. Right: Output screenshot of svg/basic/test7.svg.</p>
+
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+  For nearest-neighbor pixel sampling, I first get the texel coordinate to the nearest integer. Then if the coordinate is in the range of the MipLevel coordinates, I return the corresponding color. Otherwise, magenta is returned. For bilinear pixel sampling, I get the 4 nearest texture coordinates (floor and ceiling for u and v, yielding 4 coordinates). If these locations are within range, I perform lerp twice and get the bilinearly-interpolated color.
+<br><br>
+  See below for nearest-neighbor and bilinear pixel sampling results. There is aliasing with the white lines in nearest-neighbor sampling (even with a higher sampling rate) because the lines are of higher-frequency than the Nyquist theorem allows when sampling texture. Bilinear sampling with rate=1 is probably the most visually-appealing option, as a higher sampling rate starts blurring signal too much.
+<br><br>
+  <div class="centered">
+    <img src="images/5-1.png" class="row-4" width="350px"/>
+    <img src="images/5-2.png" class="row-4" width="350px"/>
+  </div>
+  <p class="caption">Nearest-neighbor pixel sampling with sampling rate of 1 (left) and 16 (right).</p>
+  <br>
+  <div class="centered">
+    <img src="images/5-3.png" class="row-4" width="350px"/>
+    <img src="images/5-4.png" class="row-4" width="350px"/>
+  </div>
+  <p class="caption">Bilinear pixel sampling with sampling rate of 1 (left) and 16 (right).</p>
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+Level sampling is used to make texture mapping more efficient by sampling the texture for each pixel from an image at a particular resolution. For example, if the pixel occupies a small number of texels, the texture for that area will be sampled from a texture image at a higher resolution. On the other hand, if a pixel occupies a large number of texels (i.e. far away in depth), it can sample texture from a low-resolution image for higher efficiency and minimal loss in quality.
+
+<br><br>
+Tradeoffs in pixel sampling: nearest-neighbor upsampling is quite fast and doesn't require much memory, but as a result produces blocky outputs more prone to aliasing. On the other hand, bilinear upsampling requires more computation but can produce better-antialiased outputs.
+
+<br><br>
+Tradeoffs in level sampling: using no mipmaps produces high-quality outputs without storing multiple texture images, but is resource-intensive when texture-mapping. On the other hand, using multiple levels requires a little more storage and degrades quality (hopefully minimally) but is memory-efficient.
+
+<br><br>
+Tradeoffs in number of samples per pixel: supersampling at higher rates requires more space in the sample buffer and more memory, but produces better antialiased outputs than using fewer samples or not supersampling at all.
+
+<br>
+<br>
+<div class="centered">
+  <img src="images/6-1.png" class="row-4" width="350px"/>
+  <img src="images/6-2.png" class="row-4" width="350px"/>
+</div>
+<div class="centered">
+  <img src="images/6-3.png" class="row-4" width="350px"/>
+  <img src="images/6-4.png" class="row-4" width="350px"/>
+</div>
+<p class="caption">Top left: zero level, NN pixel. Top right: NN level, NN pixel. Bottom left: Bilinear level, NN pixel. Bottom right: Bilinear level, bilinear pixel.</p>
+</body>
 </html>
