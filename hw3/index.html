@@ -296,7 +296,12 @@
 		Walk through your implementation of the indirect lighting function.
 	</h3>
 	<p>
-		YOUR RESPONSE GOES HERE
+		My implementation of the indirect lighting function works as follows:
+		First, I sample the BSDF to get the reflectance and the new direction w_in (converted to world coordinates).
+		I then cast a ray with the new direction and check if it intersects with anything.
+		If there is an intersection and we move past the Russian roulette (coin flip with p=0.7),
+		I get the radiance from indirect bounces with a recursive call to at_least_one_bounce_radiance, accumulate that value,
+		and return the final radiance as the sampled BSDF * radiance * cos(w_in) / pdf / 0.7.
 	</p>
 	<br>
 
@@ -308,12 +313,12 @@
 		<table style="width:100%">
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>example1.dae</figcaption>
+					<img src="images/CBspheres_global_indirect.png" align="middle" width="400px"/>
+					<figcaption>CBspheres_lambertian.dae with indirect global illumination.</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>example2.dae</figcaption>
+					<img src="images/CBspheres_global_direct.png" align="middle" width="400px"/>
+					<figcaption>CBspheres_lambertian.dae with direct global illumination</figcaption>
 				</td>
 			</tr>
 		</table>
@@ -328,12 +333,12 @@
 		<table style="width:100%">
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Only direct illumination (example1.dae)</figcaption>
+					<img src="images/CBbunny_global_direct.png" align="middle" width="400px"/>
+					<figcaption>Only direct illumination (CBbunny.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Only indirect illumination (example1.dae)</figcaption>
+					<img src="images/CBbunny_global_indirect.png" align="middle" width="400px"/>
+					<figcaption>Only indirect illumination (CBbunny.dae)</figcaption>
 				</td>
 			</tr>
 		</table>
@@ -443,7 +448,11 @@
 		Explain adaptive sampling. Walk through your implementation of the adaptive sampling.
 	</h3>
 	<p>
-		YOUR RESPONSE GOES HERE
+		Adaptive sampling is a technique that allows us to concentrate our sampling efforts in more difficult parts of the image. This
+		works by detecting whether each pixel has converged (i.e. whether we can stop tracing more rays). My algorithm work as follows:
+		First, after every samplesPerBatch number of pixels, I calculate mean and standard deviation of the batch radiance. Then, I
+		check whether (1.96 * std / sqrt(nSamples) < maxTolerance * mean. If this condition is met, the pixel is converged and I stop
+		tracing more rays for that pixel. I then continue tracing rays for the rest of the pixels until all pixels are converged.
 	</p>
 	<br>
 
