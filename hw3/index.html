@@ -44,7 +44,7 @@
 
 <body>
 
-<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
 <h1 align="middle">Project 3-1: Path Tracer</h1>
 <h2 align="middle">Stephanie Fu</h2>
 
@@ -58,7 +58,10 @@
 <div>
 	<h2 align="middle">Overview</h2>
 	<p>
-		YOUR RESPONSE GOES HERE
+		In this homework, I implemented the core functionality of a physically-based renderer with a pathtracing algorithm.
+		I checked for scene intersections, implemented a bounding volume hierarchy (BVH) algorithm to speed up ray intersection tests,
+		implemented full global illumination with indirect lighting effects, and adaptive sampling. I also compared the results of different
+		techniques on various scenes.
 	</p>
 	<br>
 
@@ -321,6 +324,16 @@
 					<figcaption>CBspheres_lambertian.dae with direct global illumination</figcaption>
 				</td>
 			</tr>
+			<tr align="center">
+				<td>
+					<img src="images/CBbunny_global_indirect.png" align="middle" width="400px"/>
+					<figcaption>CBbunny.dae with indirect global illumination.</figcaption>
+				</td>
+				<td>
+					<img src="images/CBbunny_global_direct.png" align="middle" width="400px"/>
+					<figcaption>CBbunny.dae with direct global illumination</figcaption>
+				</td>
+			</tr>
 		</table>
 	</div>
 	<br>
@@ -345,7 +358,8 @@
 	</div>
 	<br>
 	<p>
-		YOUR EXPLANATION GOES HERE
+		As seen above, the lighting is not as realistic with only direct illumination. The indirect, full global
+		illumination adds depth and realism, especially in the shadows and areas not directly lit by the light source.
 	</p>
 	<br>
 
@@ -357,27 +371,27 @@
 		<table style="width:100%">
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_m0.png" align="middle" width="400px"/>
 					<figcaption>max_ray_depth = 0 (CBbunny.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_m1.png" align="middle" width="400px"/>
 					<figcaption>max_ray_depth = 1 (CBbunny.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_m2.png" align="middle" width="400px"/>
 					<figcaption>max_ray_depth = 2 (CBbunny.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_m3.png" align="middle" width="400px"/>
 					<figcaption>max_ray_depth = 3 (CBbunny.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_m100.png" align="middle" width="400px"/>
 					<figcaption>max_ray_depth = 100 (CBbunny.dae)</figcaption>
 				</td>
 			</tr>
@@ -385,7 +399,7 @@
 	</div>
 	<br>
 	<p>
-		YOUR EXPLANATION GOES HERE
+		As the max_ray_depth increases, we get brighter images because more light bounces are allowed before terminating the ray.
 	</p>
 	<br>
 
@@ -397,37 +411,37 @@
 		<table style="width:100%">
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s1.png" align="middle" width="400px"/>
 					<figcaption>1 sample per pixel (example1.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s2.png" align="middle" width="400px"/>
 					<figcaption>2 samples per pixel (example1.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s4.png" align="middle" width="400px"/>
 					<figcaption>4 samples per pixel (example1.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s8.png" align="middle" width="400px"/>
 					<figcaption>8 samples per pixel (example1.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s16.png" align="middle" width="400px"/>
 					<figcaption>16 samples per pixel (example1.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s64.png" align="middle" width="400px"/>
 					<figcaption>64 samples per pixel (example1.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
+					<img src="images/CBbunny_s1024.png" align="middle" width="400px"/>
 					<figcaption>1024 samples per pixel (example1.dae)</figcaption>
 				</td>
 			</tr>
@@ -435,7 +449,8 @@
 	</div>
 	<br>
 	<p>
-		YOUR EXPLANATION GOES HERE
+		As the number of samples per pixel increases, we reduce noise because higher sample rate means that we get a more
+		accurate estimate of radiance at each pixel.
 	</p>
 	<br>
 
@@ -464,22 +479,22 @@
 		<table style="width:100%">
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Rendered image (example1.dae)</figcaption>
+					<img src="images/bunny_adaptive.png" align="middle" width="400px"/>
+					<figcaption>Rendered image (CBbunny.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Sample rate image (example1.dae)</figcaption>
+					<img src="images/bunny_adaptive_rate.png" align="middle" width="400px"/>
+					<figcaption>Sample rate image (CBbunny.dae)</figcaption>
 				</td>
 			</tr>
 			<tr align="center">
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Rendered image (example2.dae)</figcaption>
+					<img src="images/spheres_adaptive.png" align="middle" width="400px"/>
+					<figcaption>Rendered image (CBspheres_lambertian.dae)</figcaption>
 				</td>
 				<td>
-					<img src="images/your_file.png" align="middle" width="400px"/>
-					<figcaption>Sample rate image (example2.dae)</figcaption>
+					<img src="images/spheres_adaptive_rate.png" align="middle" width="400px"/>
+					<figcaption>Sample rate image (CBspheres_lambertian.dae)</figcaption>
 				</td>
 			</tr>
 		</table>
