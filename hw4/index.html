@@ -1,7 +1,296 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<style>
+		body {
+			padding: 100px;
+			width: 1000px;
+			margin: auto;
+			text-align: left;
+			font-weight: 300;
+			font-family: 'Open Sans', sans-serif;
+			color: #121212;
+		}
+		h1, h2, h3, h4 {
+			font-family: 'Source Sans Pro', sans-serif;
+		}
+	</style>
+	<title>CS 184 Mesh Editor</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Stephanie Fu, CS284A</h2>
+
+<br><br>
+
+<div>
+
+	<h2 align="middle">Overview</h2>
+	<p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+
+	<h2 align="middle">Part I: Masses and springs</h2>
+	See below for screenshots of the simulated cloth wireframe with various constraints.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/1-all.png" align="middle" width="300px"/>
+					<figcaption>Simulated cloth wireframe with all constraints</figcaption>
+				</td>
+				<td>
+					<img src="img/1-noshear.png" align="middle" width="300px"/>
+					<figcaption>Cloth wireframe with no shearing constraints</figcaption>
+				</td>
+				<td>
+					<img src="img/1-onlyshear.png" align="middle" width="300px"/>
+					<figcaption>Cloth wireframe with only shearing constraints</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<h2 align="middle">Part II: Simulation via numerical integration</h2>
+
+	See below for screenshots of ../scene/pinned2.json with varying ks constants.
+	As the spring constant increases, the cloth becomes more rigid and less likely to deform. Once ks reaches 10000, the cloth barely wrinkles and just sags a little.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/2-ks10.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with ks=10</figcaption>
+				</td>
+				<td>
+					<img src="img/2-ks500.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with ks=500</figcaption>
+				</td>
+				<td>
+					<img src="img/2-ks5000.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with ks=5000</figcaption>
+				</td>
+				<td>
+					<img src="img/2-ks50000.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with ks=10000</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br><br>
+	See below for screenshots of ../scene/pinned2.json with varying densities.
+	As we increase that parameter, the cloth experiences more gravitational force and sags more.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/2-density15.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with density=15</figcaption>
+				</td>
+				<td>
+					<img src="img/2-density100.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with density=100</figcaption>
+				</td>
+				<td>
+					<img src="img/2-density1000.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with density=1000</figcaption>
+				</td>
+				<td>
+					<img src="img/2-density5000.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with density=5000</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br><br>
+	See below for screenshots of ../scene/pinned2.json with varying damping values. As we increase the damping parameter, the cloth becomes less likely to oscillate. The first two screenshots show the cloth still in motion.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/2-damp1.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with damping=0.00%</figcaption>
+				</td>
+				<td>
+					<img src="img/2-damp2.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with damping=0.10%</figcaption>
+				</td>
+				<td>
+					<img src="img/2-damp3.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with damping=0.29%</figcaption>
+				</td>
+				<td>
+					<img src="img/2-damp4.png" align="middle" width="240px"/>
+					<figcaption>Cloth normal map with damping=0.57%</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br><br>
+	Below is a screenshot of ../scene/pinned4.json at rest with default parameters.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/2-pinned4.png" align="middle" width="500px"/>
+					<figcaption></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<h2 align="middle">Part III: Handling collisions with other objects</h2>
+	Below are screenshots of shaded cloth from ../scene/sphere.json in its final resting state on the sphere with varying spring constants. As ks increases, the cloth becomes more rigid and less likely to conform tightly to the sphere.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/3-ks500.png" align="middle" width="300px"/>
+					<figcaption>Cloth normal map with ks=500</figcaption>
+				</td>
+				<td>
+					<img src="img/3-ks5000.png" align="middle" width="300px"/>
+					<figcaption>Cloth normal map with ks=5000</figcaption>
+				</td>
+				<td>
+					<img src="img/3-ks50000.png" align="middle" width="300px"/>
+					<figcaption>Cloth normal map with ks=50000</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<br><br>
+	Below is a screenshot of ../scene/plane.json at rest with default parameters.
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/3-plane.png" align="middle" width="500px"/>
+					<figcaption></figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<h2 align="middle">Part IV: Handling self-collisions</h2>
+	<div align="middle">
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/4-1.png" align="middle" width="300px"/>
+					<figcaption>Falling cloth with default parameters: <br>early stage</figcaption>
+				</td>
+				<td>
+					<img src="img/4-2.png" align="middle" width="300px"/>
+					<figcaption>Falling cloth with default parameters: <br>middle stage</figcaption>
+				</td>
+				<td>
+					<img src="img/4-3.png" align="middle" width="300px"/>
+					<figcaption>Falling cloth with default parameters: <br>resting state</figcaption>
+				</td>
+			</tr>
+		</table>
+		<br><br>
+		<table style="width:100%">
+			<tr align="center">
+				<td>
+					<img src="img/4-density100.png" align="middle" width="450px"/>
+					<figcaption>Falling cloth with higher density. The cloth falls more vertically, as it seems that gravity is overpowering any horizontal or upwards force from self-collision.</figcaption>
+				</td>
+				<td>
+					<img src="img/4-ks10.png" align="middle" width="450px"/>
+					<figcaption>Falling cloth with lower spring constant. The cloth bounces against itself less, and falls more directly to its resting state.</figcaption>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<h2 align="middle">Part V: Shaders</h2>
+	A shader is a program that runs on the GPU and computes the properties of each pixel or fragment that will be rendered to the screen. Vertex shaders are run on each vertex of a mesh, modifying geometric properties to get the final vertex to be rendered. Then, the fragment shader processes fragments with geometric attributes previously computed by the vertex shader and outputs the final color to be viewed on-screen.
+
+	<br><br>
+
+	The Blinn-Phong shading model is made up of three terms: a constant ambient part; a diffuse term that depends on the angle between the light ray and surface normal; and a specular term that encodes a more "glossy" type of light reflection. Each of these terms depends on its own constant and physical properties of the light and surface. See below for screenshots of the cloth with each term isolated, and the final Blinn-Phong shading model.
+	<br><br>
+
+	<table style="width:100%">
+		<tr align="center">
+			<td>
+				<img src="img/5-ambient.png" align="middle" width="230px"/>
+				<figcaption>Cloth: ambient only</figcaption>
+			</td>
+			<td>
+				<img src="img/5-diffuse.png" align="middle" width="230px"/>
+				<figcaption>Cloth: diffuse only</figcaption>
+			</td>
+			<td>
+				<img src="img/5-specular.png" align="middle" width="230px"/>
+				<figcaption>Cloth: specular only</figcaption>
+			</td>
+			<td>
+				<img src="img/5-bp.png" align="middle" width="230px"/>
+				<figcaption>Cloth: Blinn-Phong</figcaption>
+			</td>
+		</tr>
+	</table>
+	<br><br>
+	<table style="width:100%">
+		<tr align="center">
+			<td>
+				<img src="img/5-texture.png" align="middle" width="300px"/>
+				<figcaption>Cloth: custom texture</figcaption>
+			</td>
+			<td>
+				<img src="img/5-mirror_sphere.png" align="middle" width="300px"/>
+				<figcaption>Cloth on sphere: mirror</figcaption>
+			</td>
+			<td>
+				<img src="img/5-mirror_plane.png" align="middle" width="300px"/>
+				<figcaption>Cloth on plane: mirror</figcaption>
+			</td>
+		</tr>
+	</table>
+	<br><br>
+	See below for the same texture as a bump map (left) and displacement map (right). In both cases, we see the cloth appear to have more depth and brick-like texture. In the displacement map, we see the cloth has more pronounced bumps and valleys.
+	<br><br>
+	<table style="width:100%">
+		<tr align="center">
+			<td>
+				<img src="img/5-bump.png" align="middle" width="500px"/>
+				<figcaption>Cloth: bump map</figcaption>
+			</td>
+			<td>
+				<img src="img/5-displacement.png" align="middle" width="500px"/>
+				<figcaption>Cloth: displacement map</figcaption>
+			</td>
+		</tr>
+	</table>
+	<br><br>
+	Below, we compare the bump map and displacement map with different mesh coarseness. The displacement map with a coarser mesh appears to have more pronounced bumps outside of the brick texture, while the displacement mesh at a higher resolution appears smoother.
+	<br><br>
+	<table style="width:100%">
+		<tr align="center">
+			<td>
+				<img src="img/5-bump_16.png" align="middle" width="500px"/>
+				<figcaption>Cloth: bump map (-o 16 -a 16)</figcaption>
+			</td>
+			<td>
+				<img src="img/5-bump_128.png" align="middle" width="500px"/>
+				<figcaption>Cloth: bump map (-o 128 -a 128)</figcaption>
+			</td>
+		</tr>
+		<tr align="center">
+			<td>
+				<img src="img/5-displacement_16.png" align="middle" width="500px"/>
+				<figcaption>Cloth: displacement map (-o 16 -a 16)</figcaption>
+			</td>
+			<td>
+				<img src="img/5-displacement_128.png" align="middle" width="500px"/>
+				<figcaption>Cloth: displacement map (-o 128 -a 128)</figcaption>
+			</td>
+		</tr>
+	</table>
+</body>
 </html>
